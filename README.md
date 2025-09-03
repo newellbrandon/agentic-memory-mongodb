@@ -54,7 +54,7 @@ python document_manager_cli.py compress
 
 ## ✨ Features
 
-- **🔄 LangGraph Workflow**: 6-step orchestrated workflow with real-time monitoring
+- **🔄 LangGraph Workflow**: 9-step orchestrated workflow with real-time monitoring
 - **🔍 Vector Search**: MongoDB Atlas semantic search across unified memory
 - **📄 Document Intelligence**: Upload PDF, MD, DOCX, HTML with AI chunking
 - **🧠 Persistent Memory**: Remembers conversations and user preferences across sessions

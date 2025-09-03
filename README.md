@@ -2,6 +2,8 @@
 
 A LangGraph agent demonstration showcasing **MongoDB Vector Search** with persistent AI memory, document processing, and intelligent reasoning.
 
+![LangGraph Agentic Memory Workflow UI](screenshot.png)
+
 ## 🚀 Quick Start
 
 ### Setup

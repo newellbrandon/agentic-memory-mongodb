@@ -1,0 +1,35 @@
+# Core requirements
+langgraph
+langchain
+langchain-community
+python-dotenv
+requests
+
+# MongoDB connection
+pymongo
+
+# Voyage AI integration
+voyageai
+
+# DuckDuckGo Search integration
+ddgs
+
+# Document processing
+PyPDF2
+markdown
+python-docx
+langchain-text-splitters
+beautifulsoup4
+
+# Streamlit frontend
+streamlit
+plotly
+altair
+
+# Optional: Web framework
+fastapi
+uvicorn
+
+# Optional: Additional utilities
+numpy
+pandas

@@ -27,11 +27,11 @@ MONGODB_CONNECTION_STRING=mongodb+srv://username:password@cluster.name.mongodb.n
 MONGODB_DATABASE=personal_ai
 MONGODB_COLLECTION=conversations
 VOYAGE_API_KEY=your_voyage_api_key_here
-VOYAGE_MODEL=voyage-large-2-instruct
+VOYAGE_MODEL=voyage-large-2-instruct  # Default model, configurable
 
 # Optional
 LM_STUDIO_BASE_URL=http://localhost:1234/v1
-LM_STUDIO_MODEL=qwen/qwen3-14b
+LM_STUDIO_MODEL=qwen/qwen3-14b  # Default model, configurable
 ```
 
 ### Launch
@@ -80,9 +80,9 @@ Chat Input → Workflow Orchestrator → Voyage AI → MongoDB Atlas → Local L
 ## 🔧 Technical Stack
 
 - **LangGraph**: Workflow orchestration with state management
-- **Voyage AI**: Text embeddings (1024 dimensions)
-- **MongoDB Atlas**: Vector search with HNSW indexing
-- **LM Studio**: Local LLM inference
+- **Voyage AI**: Text embeddings (configurable via VOYAGE_MODEL, 1024 dimensions)
+- **MongoDB Atlas**: Vector search with HNSW indexing (memory_vector_index)
+- **LM Studio**: Local LLM inference (configurable via LM_STUDIO_MODEL)
 - **Streamlit**: Web interface
 
 ### MongoDB Configuration

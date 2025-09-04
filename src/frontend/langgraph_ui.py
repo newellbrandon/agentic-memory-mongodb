@@ -12,10 +12,14 @@ from typing import Dict, Any, List
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Import our LangGraph agent
 import sys
-import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from langgraph_agent import LangGraphAgent
 
@@ -24,10 +28,19 @@ from src.frontend.document_management_ui import DocumentManagementUI
 class LangGraphUI:
     """Streamlit UI for the LangGraph Agent workflow."""
     
+    def get_model_configs(self):
+        """Get model configurations from environment variables."""
+        return {
+            "voyage_model": os.getenv("VOYAGE_MODEL", "voyage-large-2-instruct"),
+            "lm_studio_model": os.getenv("LM_STUDIO_MODEL", "qwen/qwen3-14b"),
+            "mongodb_database": os.getenv("MONGODB_DATABASE", "personal_ai"),
+            "vector_index": "memory_vector_index"  # This is hardcoded in the codebase
+        }
+    
     def __init__(self):
         """Initialize the UI."""
         st.set_page_config(
-            page_title="LangGraph Agent Workflow",
+            page_title="Agentic Memory with MongoDB",
             page_icon="🚀",
             layout="wide",
             initial_sidebar_state="expanded"
@@ -46,15 +59,22 @@ class LangGraphUI:
     
     def setup_ui_sync(self):
         """Setup the main UI components synchronously."""
-        st.title("🚀 LangGraph Agent Workflow")
+        st.title("🚀 Agentic Memory with MongoDB")
         st.markdown("**Complete AI Workflow: Query → Embedding → Vector Search → LLM Reasoning → Response**")
+        
+        # Get model configurations dynamically
+        configs = self.get_model_configs()
+        st.markdown(f"**Technology Stack: LangGraph + Voyage AI ({configs['voyage_model']}) + MongoDB Atlas ({configs['vector_index']}) + LM Studio ({configs['lm_studio_model']}) + Python**")
+        
+        # Main workflow display showing all 9 steps with technologies
+        self.setup_main_workflow_display()
         
         # Sidebar for configuration
         self.setup_sidebar()
         
         # Create tabs for different sections
         tab1, tab2, tab3, tab4 = st.tabs([
-            "🤖 LangGraph Agent", 
+            "🤖 Agentic Memory", 
             "📚 Document Management",
             "📊 Memory Analytics", 
             "⚙️ Settings"
@@ -92,7 +112,7 @@ class LangGraphUI:
         
         # Create tabs for different sections
         tab1, tab2, tab3, tab4 = st.tabs([
-            "🤖 LangGraph Agent", 
+            "🤖 Agentic Memory", 
             "📚 Document Management",
             "📊 Memory Analytics", 
             "⚙️ Settings"
@@ -187,17 +207,20 @@ class LangGraphUI:
             # Workflow progress
             st.subheader("📈 Workflow Progress")
             
+            # Get model configurations dynamically
+            configs = self.get_model_configs()
+            
             # Create progress indicators
             steps = [
-                "Query Processing",
-                "Query Optimization",
-                "Embedding Generation", 
-                "MongoDB Search",
-                "Results Analysis",
-                "LLM Reasoning",
-                "Response Generation",
-                "Conversation Storage",
-                "Personal Info Extraction"
+                "Query Processing (LangGraph)",
+                "Query Optimization (LangGraph)",
+                f"Embedding Generation (Voyage AI: {configs['voyage_model']})", 
+                f"MongoDB Search (Atlas: {configs['vector_index']})",
+                f"Results Analysis (LM Studio: {configs['lm_studio_model']})",
+                f"LLM Reasoning (LM Studio: {configs['lm_studio_model']})",
+                f"Response Generation (LM Studio: {configs['lm_studio_model']})",
+                f"Conversation Storage (MongoDB: {configs['mongodb_database']} collection)",
+                f"Personal Info Extraction (LM Studio: {configs['lm_studio_model']})"
             ]
             
             completed_steps = len(workflow.get('workflow_steps', []))
@@ -247,6 +270,125 @@ class LangGraphUI:
         else:
             st.info("👆 Enter a query and click 'Run Workflow' to start the LangGraph agent workflow.")
     
+    def setup_main_workflow_display(self):
+        """Setup the main workflow display showing all 9 steps with technologies."""
+        st.markdown("---")
+        st.header("🔄 9-Step AI Workflow Process")
+        st.markdown("**Understanding the complete technology stack and process flow:**")
+        
+        # Get model configurations dynamically
+        configs = self.get_model_configs()
+        
+        # Define the 9 steps with their technologies and specific configurations
+        workflow_steps = [
+            {
+                "step": 1,
+                "name": "Query Processing",
+                "technology": "LangGraph",
+                "model": "Workflow Orchestrator",
+                "description": "Input validation and preparation",
+                "icon": "🔍"
+            },
+            {
+                "step": 2,
+                "name": "Query Optimization",
+                "technology": "LangGraph",
+                "model": "Workflow Orchestrator",
+                "description": "Query enhancement and context preparation",
+                "icon": "⚡"
+            },
+            {
+                "step": 3,
+                "name": "Embedding Generation",
+                "technology": "Voyage AI",
+                "model": configs["voyage_model"],
+                "description": "Convert text to 1024-dimensional vectors",
+                "icon": "🧠"
+            },
+            {
+                "step": 4,
+                "name": "MongoDB Search",
+                "technology": "MongoDB Atlas",
+                "model": configs["vector_index"],
+                "description": "Vector similarity search with HNSW indexing",
+                "icon": "🔎"
+            },
+            {
+                "step": 5,
+                "name": "Results Analysis",
+                "technology": "LM Studio",
+                "model": configs["lm_studio_model"],
+                "description": "Score analysis and context preparation",
+                "icon": "📊"
+            },
+            {
+                "step": 6,
+                "name": "LLM Reasoning",
+                "technology": "LM Studio",
+                "model": configs["lm_studio_model"],
+                "description": "Local LLM analysis and reasoning",
+                "icon": "🤖"
+            },
+            {
+                "step": 7,
+                "name": "Response Generation",
+                "technology": "LM Studio",
+                "model": configs["lm_studio_model"],
+                "description": "Generate final comprehensive answer",
+                "icon": "💬"
+            },
+            {
+                "step": 8,
+                "name": "Conversation Storage",
+                "technology": "MongoDB Atlas",
+                "model": f"{configs['mongodb_database']} collection",
+                "description": "Store conversation in unified memory",
+                "icon": "💾"
+            },
+            {
+                "step": 9,
+                "name": "Personal Info Extraction",
+                "technology": "LM Studio",
+                "model": configs["lm_studio_model"],
+                "description": "Extract and store user preferences",
+                "icon": "👤"
+            }
+        ]
+        
+        # Create a visual workflow display
+        cols = st.columns(3)
+        
+        for i, step in enumerate(workflow_steps):
+            col_idx = i % 3
+            with cols[col_idx]:
+                st.markdown(f"""
+                <div style="
+                    border: 2px solid #e0e0e0;
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin: 10px 0;
+                    background-color: #f8f9fa;
+                    text-align: center;
+                ">
+                    <h4 style="margin: 0; color: #2c3e50;">
+                        {step['icon']} Step {step['step']}
+                    </h4>
+                    <h5 style="margin: 5px 0; color: #34495e;">
+                        {step['name']}
+                    </h5>
+                    <p style="margin: 5px 0; font-weight: bold; color: #e74c3c;">
+                        {step['technology']}
+                    </p>
+                    <p style="margin: 3px 0; font-weight: bold; color: #8e44ad; font-size: 0.9em;">
+                        Model: {step['model']}
+                    </p>
+                    <p style="margin: 5px 0; font-size: 0.9em; color: #7f8c8d;">
+                        {step['description']}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        st.markdown("---")
 
     def show_response_with_expandable_thinking(self, text):
         """Show response with expandable thinking sections."""

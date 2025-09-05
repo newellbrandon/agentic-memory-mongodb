@@ -33,7 +33,7 @@ LM_STUDIO_MODEL=qwen/qwen3-14b
 - **`src/services/llm_service.py`** - Voyage AI embeddings and LM Studio integration
 - **`demo_langgraph_agent.py`** - Command-line demo of the workflow
 - **`document_manager_cli.py`** - CLI for document management operations
-- **`launch_langgraph_ui.py`** - Launcher for Streamlit UI
+- **`main.py`** - Main launcher for Streamlit UI
 - **`run_tests.py`** - Comprehensive test runner for all components
 
 ## 🎯 Core Workflow Steps
@@ -66,7 +66,7 @@ python demo_langgraph_agent.py demo
 python demo_langgraph_agent.py interactive
 
 # Launch Streamlit UI
-python launch_langgraph_ui.py
+python main.py
 
 # Document management
 python document_manager_cli.py list                    # List all documents
@@ -76,6 +76,7 @@ python document_manager_cli.py disable doc_abc123      # Disable a document
 python document_manager_cli.py delete doc_abc123       # Delete a document
 python document_manager_cli.py compress                # Compress duplicate memories
 python document_manager_cli.py stats                   # Get statistics
+python document_manager_cli.py reembed                 # Reembed all documents (when model changes)
 
 # Run comprehensive tests
 python run_tests.py

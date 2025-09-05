@@ -44,7 +44,7 @@ python demo_langgraph_agent.py demo
 python demo_langgraph_agent.py interactive
 
 # Web UI
-python launch_langgraph_ui.py
+python main.py
 
 # Document management
 python document_manager_cli.py list
@@ -106,7 +106,7 @@ agentic-mongodb/
 │   └── frontend/                  # Streamlit UI
 ├── demo_langgraph_agent.py        # CLI demo
 ├── document_manager_cli.py        # Document management
-├── launch_langgraph_ui.py         # UI launcher
+├── main.py                        # Main launcher for Streamlit UI
 └── run_tests.py                   # Test runner
 ```
 

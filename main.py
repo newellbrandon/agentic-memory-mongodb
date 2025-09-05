@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Launcher for LangGraph Agent Streamlit UI
-Demonstrates the complete AI workflow with visual feedback
+Main Launcher for Agentic Memory with MongoDB
+Launch the complete AI workflow with visual feedback
 """
 
 import subprocess
@@ -10,9 +10,9 @@ import os
 from pathlib import Path
 
 def main():
-    """Launch the LangGraph Agent Streamlit UI."""
+    """Launch the Agentic Memory Streamlit UI."""
     
-    print("🚀 LangGraph Agent Workflow UI Launcher")
+    print("🚀 Agentic Memory with MongoDB")
     print("=" * 50)
     
     # Check if we're in the right directory
@@ -46,16 +46,17 @@ def main():
             print(f"Installing {package}...")
             subprocess.run([sys.executable, "-m", "pip", "install", package])
     
-    print("\n🚀 Starting LangGraph Agent Workflow UI...")
+    print("\n🚀 Starting Agentic Memory UI...")
     print("📱 The UI will open in your default web browser")
     print("🔗 If it doesn't open automatically, go to: http://localhost:8501")
     print("\n" + "=" * 50)
     print("🎯 Features:")
-    print("• Complete workflow visualization")
+    print("• Complete 10-step AI workflow visualization")
     print("• Real-time step-by-step execution")
     print("• Embedding generation with Voyage AI")
     print("• MongoDB Atlas vector search")
-    print("• Local LLM reasoning")
+    print("• Local LLM reasoning with LM Studio")
+    print("• Document management and memory compression")
     print("• Performance metrics and analytics")
     print("• Workflow history and comparison")
     print("=" * 50)
@@ -76,4 +77,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

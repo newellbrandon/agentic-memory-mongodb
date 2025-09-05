@@ -189,6 +189,30 @@ class DocumentManagerCLI:
             
         except Exception as e:
             print(f"❌ Failed to get statistics: {str(e)}")
+    
+    async def reembed_documents(self, force: bool = False):
+        """Reembed all documents with the current model."""
+        try:
+            print("🔄 Starting reembedding process...")
+            
+            if not force:
+                print("⚠️  WARNING: This will regenerate ALL embeddings in your database!")
+                print("   This process may take a while depending on the number of documents.")
+                confirm = input("   Type 'yes' to confirm: ")
+                
+                if confirm.lower() != 'yes':
+                    print("❌ Reembedding cancelled.")
+                    return
+            
+            # Import the reembedding service
+            from reembed_documents import ReembeddingService
+            
+            # Run reembedding
+            reembedding_service = ReembeddingService()
+            await reembedding_service.run_reembedding()
+            
+        except Exception as e:
+            print(f"❌ Reembedding failed: {str(e)}")
 
 async def main():
     """Main CLI function."""
@@ -217,6 +241,9 @@ Examples:
   
   # Get statistics
   python document_manager_cli.py stats
+  
+  # Reembed all documents (when model changes)
+  python document_manager_cli.py reembed
         """
     )
     
@@ -253,6 +280,11 @@ Examples:
     # Stats command
     subparsers.add_parser('stats', help='Get document and memory statistics')
     
+    # Reembed command
+    reembed_parser = subparsers.add_parser('reembed', help='Reembed all documents with current model')
+    reembed_parser.add_argument('--force', action='store_true',
+                               help='Skip confirmation prompt')
+    
     args = parser.parse_args()
     
     if not args.command:
@@ -278,6 +310,8 @@ Examples:
             await cli.compress_memories(args.user_id)
         elif args.command == 'stats':
             await cli.get_stats()
+        elif args.command == 'reembed':
+            await cli.reembed_documents(args.force)
     
     # Run the async command
     await run_command()

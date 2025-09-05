@@ -356,7 +356,7 @@ python demo_langgraph_agent.py demo
 python demo_langgraph_agent.py interactive
 
 # Launch Streamlit workflow UI
-python launch_langgraph_ui.py
+python main.py
 
 # Test individual components
 python -c "from src.langgraph_agent import LangGraphAgent; import asyncio; asyncio.run(LangGraphAgent().run_workflow('test query', 'test_user'))"

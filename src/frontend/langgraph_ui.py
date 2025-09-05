@@ -32,6 +32,7 @@ class LangGraphUI:
         """Get model configurations from environment variables."""
         return {
             "voyage_model": os.getenv("VOYAGE_MODEL", "voyage-large-2-instruct"),
+            "rerank_model": os.getenv("VOYAGE_RERANK", "rerank-2.5"),
             "lm_studio_model": os.getenv("LM_STUDIO_MODEL", "qwen/qwen3-14b"),
             "mongodb_database": os.getenv("MONGODB_DATABASE", "personal_ai"),
             "vector_index": "memory_vector_index"  # This is hardcoded in the codebase
@@ -216,6 +217,7 @@ class LangGraphUI:
                 "Query Optimization (LangGraph)",
                 f"Embedding Generation (Voyage AI: {configs['voyage_model']})", 
                 f"MongoDB Search (Atlas: {configs['vector_index']})",
+                f"Results Reranking (Voyage AI: {configs['rerank_model']})",
                 f"Results Analysis (LM Studio: {configs['lm_studio_model']})",
                 f"LLM Reasoning (LM Studio: {configs['lm_studio_model']})",
                 f"Response Generation (LM Studio: {configs['lm_studio_model']})",
@@ -271,15 +273,15 @@ class LangGraphUI:
             st.info("👆 Enter a query and click 'Run Workflow' to start the LangGraph agent workflow.")
     
     def setup_main_workflow_display(self):
-        """Setup the main workflow display showing all 9 steps with technologies."""
+        """Setup the main workflow display showing all 10 steps with technologies."""
         st.markdown("---")
-        st.header("🔄 9-Step AI Workflow Process")
+        st.header("🔄 10-Step AI Workflow Process")
         st.markdown("**Understanding the complete technology stack and process flow:**")
         
         # Get model configurations dynamically
         configs = self.get_model_configs()
         
-        # Define the 9 steps with their technologies and specific configurations
+        # Define the 10 steps with their technologies and specific configurations
         workflow_steps = [
             {
                 "step": 1,
@@ -315,6 +317,14 @@ class LangGraphUI:
             },
             {
                 "step": 5,
+                "name": "Results Reranking",
+                "technology": "Voyage AI",
+                "model": configs["rerank_model"],
+                "description": "Rerank results for better relevance",
+                "icon": "🔄"
+            },
+            {
+                "step": 6,
                 "name": "Results Analysis",
                 "technology": "LM Studio",
                 "model": configs["lm_studio_model"],
@@ -322,7 +332,7 @@ class LangGraphUI:
                 "icon": "📊"
             },
             {
-                "step": 6,
+                "step": 7,
                 "name": "LLM Reasoning",
                 "technology": "LM Studio",
                 "model": configs["lm_studio_model"],
@@ -330,7 +340,7 @@ class LangGraphUI:
                 "icon": "🤖"
             },
             {
-                "step": 7,
+                "step": 8,
                 "name": "Response Generation",
                 "technology": "LM Studio",
                 "model": configs["lm_studio_model"],
@@ -338,7 +348,7 @@ class LangGraphUI:
                 "icon": "💬"
             },
             {
-                "step": 8,
+                "step": 9,
                 "name": "Conversation Storage",
                 "technology": "MongoDB Atlas",
                 "model": f"{configs['mongodb_database']} collection",
@@ -346,7 +356,7 @@ class LangGraphUI:
                 "icon": "💾"
             },
             {
-                "step": 9,
+                "step": 10,
                 "name": "Personal Info Extraction",
                 "technology": "LM Studio",
                 "model": configs["lm_studio_model"],

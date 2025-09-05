@@ -72,6 +72,7 @@ class LangGraphAgent:
         workflow.add_node("optimize_query", self._optimize_search_query)
         workflow.add_node("generate_embedding", self._generate_embedding)
         workflow.add_node("search_mongodb", self._search_mongodb)
+        workflow.add_node("rerank_results", self._rerank_results)
         workflow.add_node("analyze_results", self._analyze_search_results)
         workflow.add_node("llm_reasoning", self._llm_reasoning)
         workflow.add_node("generate_response", self._generate_final_response)
@@ -83,7 +84,8 @@ class LangGraphAgent:
         workflow.add_edge("process_query", "optimize_query")
         workflow.add_edge("optimize_query", "generate_embedding")
         workflow.add_edge("generate_embedding", "search_mongodb")
-        workflow.add_edge("search_mongodb", "analyze_results")
+        workflow.add_edge("search_mongodb", "rerank_results")
+        workflow.add_edge("rerank_results", "analyze_results")
         workflow.add_edge("analyze_results", "llm_reasoning")
         workflow.add_edge("llm_reasoning", "generate_response")
         workflow.add_edge("generate_response", "store_conversation")
@@ -238,6 +240,65 @@ Return ONLY the optimized search queries, one per line, no explanations."""
         
         return state
     
+    async def _rerank_results(self, state: AgentState) -> AgentState:
+        """Step 5: Rerank search results using Voyage AI reranking model."""
+        print("\n" + "="*80)
+        print("🔄 STEP 5: RERANKING SEARCH RESULTS")
+        print("="*80)
+        
+        try:
+            start_time = datetime.now()
+            
+            # Get the search results and query
+            search_results = state.get("search_results", [])
+            user_query = state.get("user_query", "")
+            
+            if not search_results:
+                print("⚠️ No search results to rerank")
+                state["workflow_steps"].append("Rerank Results (Skipped - No Results)")
+                return state
+            
+            print(f"🔄 Reranking {len(search_results)} search results...")
+            print(f"🔗 Rerank Model: {self.llm_service.voyage_rerank_model}")
+            
+            # Rerank the results
+            reranked_results = await self.llm_service.rerank_results(
+                query=user_query,
+                documents=search_results,
+                top_k=10
+            )
+            
+            end_time = datetime.now()
+            rerank_time = (end_time - start_time).total_seconds()
+            
+            print(f"✅ Reranking completed successfully")
+            print(f"📊 Reranked results: {len(reranked_results)}")
+            print(f"⏱️  Rerank time: {rerank_time:.3f} seconds")
+            
+            # Show top reranked results
+            if reranked_results:
+                print(f"\n📋 Top reranked results:")
+                for i, result in enumerate(reranked_results[:5], 1):
+                    content_type = result.get("content_type", "unknown")
+                    rerank_score = result.get("rerank_score", 0.0)
+                    original_score = result.get("score", 0.0)
+                    content_preview = result.get("content", "")[:100] + "..." if len(result.get("content", "")) > 100 else result.get("content", "")
+                    
+                    print(f"   {i}. [{content_type:12}] Rerank: {rerank_score:.4f} | Original: {original_score:.4f} | {content_preview}")
+            
+            # Update state with reranked results
+            state["search_results"] = reranked_results
+            state["workflow_steps"].append("Rerank Results (Voyage AI)")
+            state["metadata"]["rerank_time"] = rerank_time
+            state["metadata"]["rerank_model"] = self.llm_service.voyage_rerank_model
+            
+            return state
+            
+        except Exception as e:
+            print(f"❌ Reranking failed: {str(e)}")
+            state["workflow_steps"].append("Rerank Results (Failed)")
+            return state
+
     async def _search_mongodb(self, state: AgentState) -> AgentState:
         """Search MongoDB Atlas using vector similarity."""
         print("\n" + "="*80)
@@ -341,7 +402,7 @@ Return ONLY the optimized search queries, one per line, no explanations."""
     async def _analyze_search_results(self, state: AgentState) -> AgentState:
         """Analyze and prepare search results for LLM reasoning."""
         print("\n" + "="*80)
-        print("📊 STEP 5: ANALYZING SEARCH RESULTS")
+        print("📊 STEP 6: ANALYZING SEARCH RESULTS")
         print("="*80)
         
         results = state["search_results"]
@@ -459,7 +520,7 @@ Return ONLY the optimized search queries, one per line, no explanations."""
     async def _llm_reasoning(self, state: AgentState) -> AgentState:
         """Use local LLM to reason about the search results."""
         print("\n" + "="*80)
-        print("🤖 STEP 6: LLM REASONING ON SEARCH RESULTS")
+        print("🤖 STEP 7: LLM REASONING ON SEARCH RESULTS")
         print("="*80)
         
         query = state["user_query"]
@@ -526,7 +587,7 @@ RESPOND WITH ONLY THE ANSWER. NO EXPLANATIONS. NO THINKING TAGS."""},
     async def _generate_final_response(self, state: AgentState) -> AgentState:
         """Generate the final response for the user."""
         print("\n" + "="*80)
-        print("🎯 STEP 7: GENERATING FINAL RESPONSE")
+        print("🎯 STEP 8: GENERATING FINAL RESPONSE")
         print("="*80)
         
         query = state["user_query"]
@@ -574,7 +635,7 @@ RESPOND WITH ONLY THE ANSWER. NO EXPLANATIONS. NO THINKING TAGS."""},
     async def _check_and_store_conversation(self, state: AgentState) -> AgentState:
         """Check for duplicate conversations and store if unique."""
         print("\n" + "="*80)
-        print("💾 STEP 8: CHECKING AND STORING CONVERSATION")
+        print("💾 STEP 9: CHECKING AND STORING CONVERSATION")
         print("="*80)
         
         user_query = state["user_query"]
@@ -641,7 +702,7 @@ RESPOND WITH ONLY THE ANSWER. NO EXPLANATIONS. NO THINKING TAGS."""},
     async def _extract_personal_info(self, state: AgentState) -> AgentState:
         """Extract and store personal information from the conversation."""
         print("\n" + "="*80)
-        print("👤 STEP 9: EXTRACTING PERSONAL INFORMATION")
+        print("👤 STEP 10: EXTRACTING PERSONAL INFORMATION")
         print("="*80)
         
         user_query = state["user_query"]

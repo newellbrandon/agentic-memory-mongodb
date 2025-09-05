@@ -27,6 +27,9 @@ class LLMService:
         # Get Voyage model from environment, with fallback
         self.voyage_model = os.getenv("VOYAGE_MODEL", "voyage-2")
         
+        # Get Voyage rerank model from environment
+        self.voyage_rerank_model = os.getenv("VOYAGE_RERANK", "rerank-2.5")
+        
         # Initialize Voyage AI client
         try:
             from voyageai import Client
@@ -58,6 +61,54 @@ class LLMService:
             print(f"⚠️ Failed to generate embedding with model {self.voyage_model}: {str(e)}")
             # Return zero vector as fallback
             return [0.0] * 1024
+    
+    async def rerank_results(self, query: str, documents: List[Dict[str, Any]], 
+                           top_k: int = 10) -> List[Dict[str, Any]]:
+        """Rerank search results using Voyage AI reranking model."""
+        try:
+            if not documents:
+                return []
+            
+            # Extract text content from documents
+            texts = []
+            for doc in documents:
+                # Try different possible content field names
+                content = (doc.get("content", "") or 
+                          doc.get("full_content", "") or 
+                          doc.get("text", "") or 
+                          doc.get("body", "") or 
+                          doc.get("description", ""))
+                if content:
+                    texts.append(content)
+            
+            if not texts:
+                return documents
+            
+            # Use Voyage AI reranking
+            rerank_result = self.voyage_client.rerank(
+                query=query,
+                documents=texts,
+                model=self.voyage_rerank_model,
+                top_k=min(top_k, len(texts))
+            )
+            
+            # Map reranked results back to original documents
+            reranked_docs = []
+            for result in rerank_result.results:
+                original_index = result.index
+                if original_index < len(documents):
+                    doc = documents[original_index].copy()
+                    # Use the correct relevance_score field
+                    doc["rerank_score"] = result.relevance_score
+                    reranked_docs.append(doc)
+            
+            print(f"✅ Reranked {len(reranked_docs)} documents using {self.voyage_rerank_model}")
+            return reranked_docs
+            
+        except Exception as e:
+            print(f"⚠️ Failed to rerank results: {str(e)}")
+            # Return original documents if reranking fails
+            return documents[:top_k]
     
     async def generate_response(self, messages: List[Dict[str, str]], 
                               context: Optional[str] = None) -> str:
